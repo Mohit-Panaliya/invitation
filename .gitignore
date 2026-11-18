@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dist-pages/
+.shots/
+.refs/
+.chrome-pdf*/
+.chrome-profile/
+.card-build/
+vibe_images/
+*.log
+.DS_Store
+Thumbs.db
