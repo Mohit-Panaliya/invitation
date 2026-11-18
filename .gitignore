@@ -10,3 +10,5 @@ vibe_images/
 *.log
 .DS_Store
 Thumbs.db
+.wrangler/
+.wrangler-dry/
