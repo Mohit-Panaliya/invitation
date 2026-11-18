@@ -1645,6 +1645,8 @@ function initClock() {
 function initRsvp() {
   const form = $("[data-rsvp]");
   if (!form) return;
+  const endpoint = "https://formsubmit.co/ajax/mohitpanaliya0@gmail.com";
+  const honeypot = $('input[name="_honey"]', form);
   const card = $(".rsvp__card");
   const seg = $("[data-seg]");
   const attendanceInput = $('input[name="attendance"]');
@@ -1851,7 +1853,32 @@ function initRsvp() {
     nameInput?.focus();
   });
 
-  form.addEventListener("submit", (event) => {
+  const sendByEmail = async (data) => {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        _subject: `RSVP — ${data.name}${data.attendance === "yes" ? " · accepts" : " · regrets"}`,
+        _template: "table",
+        _captcha: "false",
+        _replyto: data.email,
+        _honey: honeypot?.value || "",
+        name: data.name,
+        email: data.email,
+        attendance: data.attendance === "yes" ? "Joyfully accepts" : "Regretfully declines",
+        guests: data.attendance === "yes" ? data.guests : 0,
+        events: data.events.length ? data.events.join(", ") : "—",
+        note: data.note || "—",
+      }),
+    });
+    if (!response.ok) throw new Error(`RSVP email failed (${response.status})`);
+    const result = await response.json().catch(() => ({}));
+    if (result.success === "false" || result.success === false) {
+      throw new Error(result.message || "RSVP email was not accepted");
+    }
+  };
+
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const name = nameInput?.value.trim() || "";
     const email = emailInput?.value.trim() || "";
@@ -1879,17 +1906,22 @@ function initRsvp() {
     if (submit) submit.disabled = true;
     if (submitLabel) submitLabel.textContent = "Sealing the reply…";
 
-    setTimeout(() => {
+    try {
+      await sendByEmail(data);
       try {
         localStorage.setItem(key, JSON.stringify(data));
       } catch {
         /* private browsing */
       }
       showSuccess(data);
+    } catch (error) {
+      console.error(error);
+      toast("We couldn't send your reply. Please check your connection and try again.");
+    } finally {
       submit?.classList.remove("is-loading");
       if (submit) submit.disabled = false;
       setTimelineLabel();
-    }, 750);
+    }
   });
 }
 

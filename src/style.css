@@ -4350,3 +4350,12 @@ body.menu-open .dock {
   .hero__side { display: none; }
   .menu { overflow-y: auto; }
 }
+
+.form__honey {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
