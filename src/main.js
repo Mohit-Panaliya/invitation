@@ -748,27 +748,6 @@ function initLocation() {
   });
 }
 
-/* ---------- Floating reply dock ---------- */
-function initDock() {
-  const dock = $("[data-dock]");
-  if (!dock) return;
-  const rsvp = $("#rsvp");
-  const footer = $("#footer");
-
-  const update = () => {
-    dock.classList.toggle("is-visible", window.scrollY > window.innerHeight * 0.9);
-    const rsvpTop = rsvp ? rsvp.getBoundingClientRect().top : Infinity;
-    const footerTop = footer ? footer.getBoundingClientRect().top : Infinity;
-    dock.classList.toggle(
-      "is-hidden",
-      rsvpTop < window.innerHeight * 0.92 || footerTop < window.innerHeight * 0.8
-    );
-  };
-
-  lenis.on("scroll", update);
-  update();
-}
-
 /* ---------- Hero scroll + pointer ---------- */
 function initHeroScroll() {
   ScrollTrigger.create({
@@ -1925,33 +1904,6 @@ function initRsvp() {
   });
 }
 
-/* ---------- WhatsApp reply ---------- */
-function initWhatsApp() {
-  const buttons = $$("[data-wa-link]");
-  const number = (document.body.dataset.whatsappNumber || "").replace(/\D/g, "");
-  if (!buttons.length || !number) return;
-  const form = $("[data-rsvp]");
-  const buildHref = () => {
-    const name = form?.querySelector('[name="name"]')?.value.trim() || "";
-    const guests = form?.querySelector('[name="guests"]')?.value || "1";
-    const events = [...(form?.querySelectorAll(".chip.is-active") || [])].map((chip) => chip.dataset.event);
-    const intro = name ? `Namaste, ${name} here. ` : "Namaste. ";
-    const guestLine = `${guests} ${guests === "1" ? "guest" : "guests"}`;
-    const eventLine = events.length ? ` for ${events.join(", ")}` : "";
-    return `https://wa.me/${number}?text=${encodeURIComponent(
-      `${intro}We are coming to Mohit & Archana's wedding in Mogri — ${guestLine}${eventLine}.`
-    )}`;
-  };
-  buttons.forEach((button) => {
-    button.hidden = false;
-    button.closest("[data-wa-row]")?.removeAttribute("hidden");
-    button.href = buildHref();
-    button.addEventListener("click", () => {
-      button.href = buildHref();
-    });
-  });
-}
-
 /* ---------- Boot ---------- */
 const safeInit = (fn) => {
   try {
@@ -1973,7 +1925,6 @@ const safeInit = (fn) => {
   initHeroSpot,
   initMarquee,
   initLocation,
-  initDock,
   initReveals,
   initTicker,
   initCountdown,
@@ -1988,7 +1939,6 @@ const safeInit = (fn) => {
   initBlessings,
   initClock,
   initRsvp,
-  initWhatsApp,
 ].forEach(safeInit);
 
 window.addEventListener("load", () => ScrollTrigger.refresh());
